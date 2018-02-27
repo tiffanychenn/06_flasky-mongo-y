@@ -10,6 +10,7 @@ Import mechanism: Used the requests and json libraries to read in the database
 import pymongo
 import requests
 import json
+from flask import Flask, render_template, request, session, redirect, url_for, flash
 
 connection = pymongo.MongoClient("homer.stuy.edu")
 
@@ -26,54 +27,23 @@ for i in data["data"]:
 #collection.insert_many(data)
 
 rating = collection.find({"rating":"g"})
-
-print "All GIFs in a specified rating (g)"
-
-print "\n\n\n"
-
-for i in rating:
-	print i
-
-print "\n\n\n"
-
 width = collection.find({"images.original.width":"146"})
 
-print "All GIFs with a specified width of 146"
+my_app = Flask(__name__)
 
-print "\n\n\n"
+@app.route("/")
+def root():
+	return render_template("index.html")
 
-for i in width:
-	print i
+@app.route("/gifs")
+def gifs():
+	form_stuff = request.args
+	rating = form_stuff["rating"]
+	try:
+		verified = form_stuff["verified"]
+		verified = True
+	except:
+		verified = False
+	GIFs = collection.find({"rating": rating, "user.username.verified": verified})
 
-print "\n\n\n"
 
-dimensions = collection.find({"images.original.width":"146", "images.original.height": "93"})
-
-print "All GIFs with a specified width of 146 and a height of 93"
-
-print "\n\n\n"
-
-for i in dimensions:
-	print i
-
-print "\n\n\n"
-
-index = collection.find({"rating":"pg", "is_indexable": {"$gt":0}})
-
-print "All GIFs with a specified rating (pg) and are indexable"
-
-print "\n\n\n"
-
-for i in index:
-	print i
-
-print "\n\n\n"
-
-names = collection.find({"$or": [{"rating": "pg"}, {"images.original.width": "300"}]})
-
-print "All GIFs with a specified rating (pg) or an original width of 300"
-
-print "\n\n\n"
-
-for i in names:
-	print i
