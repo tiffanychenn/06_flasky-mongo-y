@@ -18,32 +18,38 @@ db = connection.CrazedAndDepraved
 collection = db.CrazyGIFs
 
 link = "http://api.giphy.com/v1/gifs/search?q=crazy&api_key=dc6zaTOxFJmzC"
-r = requests.get(link)		#make the API call
-data = r.json()				#convert to a json object
+r = requests.get(link)      #make the API call
+data = r.json()             #convert to a json object
 
 for i in data["data"]:
-	collection.insert_one(i)
+    collection.insert_one(i)
 
 #collection.insert_many(data)
 
-rating = collection.find({"rating":"g"})
-width = collection.find({"images.original.width":"146"})
+#rating = collection.find({"rating":"g"})
+#width = collection.find({"images.original.width":"146"})
 
-my_app = Flask(__name__)
+app = Flask(__name__)
 
 @app.route("/")
 def root():
-	return render_template("index.html")
+    return render_template("index.html")
 
 @app.route("/gifs")
 def gifs():
-	form_stuff = request.args
-	rating = form_stuff["rating"]
-	try:
-		verified = form_stuff["verified"]
-		verified = True
-	except:
-		verified = False
-	GIFs = collection.find({"rating": rating, "user.username.verified": verified})
+    form_stuff = request.args
+    rating = form_stuff["rating"]
+    try:
+        verified = form_stuff["verified"]
+        verified = True
+    except:
+        verified = False
+    print rating, verified
+    GIFs = collection.find({"rating": rating, "user.is_verified": verified})
+    for i in GIFs:
+        print i
+    return render_template("index.html")
 
-
+if __name__ == '__main__':
+    app.debug = True
+    app.run()
