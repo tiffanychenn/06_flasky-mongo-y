@@ -46,9 +46,12 @@ def gifs():
         verified = False
     print rating, verified
     GIFs = collection.find({"rating": rating, "user.is_verified": verified})
+    list_of_gifs = []
     for i in GIFs:
-        print i
-    return render_template("index.html")
+        list_of_gifs.append(i["images"]["original"]["url"])
+    if len(list_of_gifs) == 0:
+        return render_template("none.html")
+    return render_template("gifs.html", gifs = list_of_gifs)
 
 if __name__ == '__main__':
     app.debug = True
