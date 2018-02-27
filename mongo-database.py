@@ -48,9 +48,12 @@ def gifs():
     GIFs = collection.find({"rating": rating, "user.is_verified": verified})
     list_of_gifs = []
     for i in GIFs:
-        list_of_gifs.append(i["images"]["original"]["url"])
+        link = i["images"]["original"]["url"]
+        if link not in list_of_gifs:
+            list_of_gifs.append(link)
     if len(list_of_gifs) == 0:
         return render_template("none.html")
+    list_of_gifs = list_of_gifs[:len(list_of_gifs) / 2]
     return render_template("gifs.html", gifs = list_of_gifs)
 
 if __name__ == '__main__':
